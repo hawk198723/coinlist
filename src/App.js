@@ -6,7 +6,6 @@ import Watchlist from "./components/WatchList";
 
 const App = ({ watchlist, setWatchlist }) => {
   const [coinData, setCoinData] = useState([]);
-  
 
   useEffect(() => {
     const fetchData = async () => {
