@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import Posts from "./components/Posts";
 // import sunburstService from "./services/API";
 import CMCAPI from "./services/CMCAPI";
 import Watchlist from "./components/WatchList";
@@ -23,15 +22,45 @@ const App = ({ watchlist, setWatchlist }) => {
     fetchData();
   }, []);
 
-  const addToWatchlist = (coin) => {
+  // const addToWatchlist = (coin) => {
+  //   if (!watchlist.some((item) => item.id === coin.id)) {
+  //     setWatchlist([...watchlist, coin]);
+  //   }
+  // };
+
+  // const onDeleteCoin = (id) => {
+  //   setWatchlist(watchlist.filter((coin) => coin.id !== id));
+  // };
+  const addToWatchlist = async (coin) => {
     if (!watchlist.some((item) => item.id === coin.id)) {
-      setWatchlist([...watchlist, coin]);
+      try {
+        await fetch("http://localhost:3000/watchlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(coin),
+        });
+
+        setWatchlist([...watchlist, coin]);
+      } catch (error) {
+        console.error("Error adding coin to watchlist", error);
+      }
     }
   };
 
-  const onDeleteCoin = (id) => {
-    setWatchlist(watchlist.filter((coin) => coin.id !== id));
-  };
+  // const onDeleteCoin = async (id) => {
+  //   try {
+  //     await fetch(`http://localhost:3000/watchlist/${id}`, {
+  //       method: "DELETE",
+  //     });
+
+  //     setWatchlist(watchlist.filter((coin) => coin.id !== id));
+  //   } catch (error) {
+  //     console.error("Error deleting coin from watchlist", error);
+  //   }
+  // };
+
   return (
     <div className="App">
       {coinData.length === 0 ? (
@@ -55,7 +84,6 @@ const App = ({ watchlist, setWatchlist }) => {
           </div>
         ))
       )}
-      <Watchlist watchlist={watchlist} onDeleteCoin={onDeleteCoin} />
     </div>
   );
 };
