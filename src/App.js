@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-// import sunburstService from "./services/API";
 import CMCAPI from "./services/CMCAPI";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Watchlist from "./components/WatchList";
 
 const App = ({ watchlist, setWatchlist }) => {
@@ -22,32 +23,36 @@ const App = ({ watchlist, setWatchlist }) => {
     fetchData();
   }, []);
 
-  // const addToWatchlist = (coin) => {
-  //   if (!watchlist.some((item) => item.id === coin.id)) {
-  //     setWatchlist([...watchlist, coin]);
-  //   }
-  // };
+  const addToWatchlist = (coin) => {
+    if (!watchlist.some((item) => item.id === coin.id)) {
+      setWatchlist([...watchlist, coin]);
+    }
+  };
 
   // const onDeleteCoin = (id) => {
   //   setWatchlist(watchlist.filter((coin) => coin.id !== id));
   // };
-  const addToWatchlist = async (coin) => {
-    if (!watchlist.some((item) => item.id === coin.id)) {
-      try {
-        await fetch("http://localhost:3000/watchlist", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(coin),
-        });
-
-        setWatchlist([...watchlist, coin]);
-      } catch (error) {
-        console.error("Error adding coin to watchlist", error);
-      }
-    }
+  const showToast = () => {
+    toast.success("Successfully added!");
   };
+
+  // const addToWatchlist = async (coin) => {
+  //   if (!watchlist.some((item) => item.id === coin.id)) {
+  //     try {
+  //       await fetch("http://localhost:3000/watchlist", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(coin),
+  //       });
+
+  //       setWatchlist([...watchlist, coin]);
+  //     } catch (error) {
+  //       console.error("Error adding coin to watchlist", error);
+  //     }
+  //   }
+  // };
 
   // const onDeleteCoin = async (id) => {
   //   try {
@@ -66,23 +71,97 @@ const App = ({ watchlist, setWatchlist }) => {
       {coinData.length === 0 ? (
         <p>Loading...</p>
       ) : (
-        coinData.map((coin) => (
-          <div key={coin.id}>
-            <h2>
-              {coin.cmc_rank}: {coin.name} ({coin.symbol})
-            </h2>
-            <p> Price:${coin.quote.USD.price}</p>
-            <p> Current Supply:{coin.circulating_supply}</p>
-            <p> Matket Cap:${coin.quote.USD.market_cap}</p>
-            <p>1h change:{coin.quote.USD.percent_change_1h}%</p>
-            <p>1day change:{coin.quote.USD.percent_change_24h}%</p>
-            <p>30day change:{coin.quote.USD.percent_change_30d}%</p>
-            <p>90day change:{coin.quote.USD.percent_change_90d}%</p>
-            <button onClick={() => addToWatchlist(coin)}>
-              Add to Watchlist
-            </button>
-          </div>
-        ))
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Symbol</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Current Supply</th>
+              <th>Market Cap</th>
+              <th>1h Change</th>
+              <th>1d Change</th>
+              <th>30d Change</th>
+              <th>90d Change</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {coinData.map((coin) => (
+              <tr key={coin.id}>
+                <td>{coin.cmc_rank}</td>
+                <td>{coin.symbol}</td>
+                <td>{coin.name}</td>
+                <td>${coin.quote.USD.price.toFixed(2)}</td>
+                <td>{coin.circulating_supply.toLocaleString()}</td>
+                <td>${coin.quote.USD.market_cap.toLocaleString()}</td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_1h >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_1h.toFixed(2)}%
+                  {coin.quote.USD.percent_change_1h >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_24h >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_24h.toFixed(2)}%
+                  {coin.quote.USD.percent_change_24h >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_30d >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_30d.toFixed(2)}%
+                  {coin.quote.USD.percent_change_30d >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_90d >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_90d.toFixed(2)}%
+                  {coin.quote.USD.percent_change_90d >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td>
+                  <button
+                    onClick={() => {
+                      showToast();
+                      addToWatchlist(coin);
+                    }}
+                  >
+                    Add to Watchlist
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

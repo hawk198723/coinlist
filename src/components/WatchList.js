@@ -1,53 +1,112 @@
-import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import "../CSS/Styles.css";
 
-function WatchList() {
-  const [watchlist, setWatchlist] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/watchlist");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        setWatchlist(data);
-      } catch (error) {
-        console.error("There has been a problem with your fetch operation:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const onDeleteCoin = async (id) => {
-    try {
-      await fetch(`http://localhost:3000/watchlist/${id}`, {
-        method: "DELETE",
-      });
-      setWatchlist(watchlist.filter((coin) => coin._id !== id)); 
-    } catch (error) {
-      console.error("Error deleting coin from watchlist", error);
+function WatchList({ watchlist, setWatchlist }) {
+  const onDeleteCoin = (id) => {
+    if (window.confirm("Are you sure to delete this coin?")) {
+      setWatchlist(watchlist.filter((coin) => coin.id !== id));
+      showToast("Successfully deleted!");
     }
   };
 
+  const showToast = (message) => {
+    toast.success(message);
+  };
+
   return (
-    <div>
+    <div className="App">
       <h1>My Watch List</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : watchlist.length > 0 ? (
-        <ul>
-          {watchlist.map((coin) => (
-            <li key={coin._id}>
-              {coin.name}
-              <button onClick={() => onDeleteCoin(coin._id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
+      {watchlist.length > 0 ? (
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Symbol</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Current Supply</th>
+              <th>Market Cap</th>
+              <th>1h Change</th>
+              <th>1d Change</th>
+              <th>30d Change</th>
+              <th>90d Change</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {watchlist.map((coin) => (
+              <tr key={coin.id}>
+                <td>{coin.cmc_rank}</td>
+                <td>{coin.symbol}</td>
+                <td>{coin.name}</td>
+                <td>${coin.quote.USD.price.toFixed(2)}</td>
+                <td>{coin.circulating_supply.toLocaleString()}</td>
+                <td>${coin.quote.USD.market_cap.toLocaleString()}</td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_1h >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_1h.toFixed(2)}%
+                  {coin.quote.USD.percent_change_1h >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_24h >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_24h.toFixed(2)}%
+                  {coin.quote.USD.percent_change_24h >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_30d >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_30d.toFixed(2)}%
+                  {coin.quote.USD.percent_change_30d >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td
+                  style={{
+                    color:
+                      coin.quote.USD.percent_change_90d >= 0 ? "green" : "red",
+                  }}
+                >
+                  {coin.quote.USD.percent_change_90d.toFixed(2)}%
+                  {coin.quote.USD.percent_change_90d >= 0 ? (
+                    <i className="fas fa-arrow-up"></i>
+                  ) : (
+                    <i className="fas fa-arrow-down"></i>
+                  )}
+                </td>
+                <td>
+                  <button
+                    onClick={() => {
+                      onDeleteCoin(coin.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       ) : (
         <p>No coins in your watch list yet...</p>
       )}
