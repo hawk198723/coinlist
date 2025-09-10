@@ -1,26 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import CMCAPI from "./services/CMCAPI";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Pagination from "./components/Pagination";
+import CoinIcon from "./components/CoinIcon";
+import PriceAlertModal from "./components/PriceAlertModal";
+import { usePriceAlert } from "./contexts/PriceAlertContext";
 
 const App = ({ watchlist, setWatchlist }) => {
   const [coinData, setCoinData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(100);
+  const [totalItems, setTotalItems] = useState(0);
+  const [alertModalOpen, setAlertModalOpen] = useState(false);
+  const [selectedCoin, setSelectedCoin] = useState(null);
+
+  const { checkPriceAlerts, getAlertsForCoin } = usePriceAlert();
+
+  // CoinMarketCap has around 10,000+ cryptocurrencies
+  const maxItems = 10000;
+  const totalPages = Math.ceil(maxItems / itemsPerPage);
+
+  const fetchData = useCallback(async (page = 1, limit = 100) => {
+    setIsLoading(true);
+    try {
+      const start = (page - 1) * limit + 1;
+      const data = await CMCAPI.getCoinData(start, limit);
+      if (data && data.data) {
+        console.log(data);
+        setCoinData(data.data);
+        // Use status info from API if available, otherwise estimate
+        setTotalItems(data.status?.total_count || maxItems);
+        
+        // 检查价格报警
+        checkPriceAlerts(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch coin data:", error);
+      toast.error("Failed to load cryptocurrency data. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await CMCAPI.getCoinData();
-        if (data && data.data) {
-          console.log(data);
-          setCoinData(data.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch coin data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    fetchData(currentPage, itemsPerPage);
+  }, [fetchData, currentPage, itemsPerPage, checkPriceAlerts]);
 
   const addToWatchlist = (coin) => {
     if (!watchlist.some((item) => item.id === coin.id)) {
@@ -28,11 +54,28 @@ const App = ({ watchlist, setWatchlist }) => {
     }
   };
 
-  // const onDeleteCoin = (id) => {
-  //   setWatchlist(watchlist.filter((coin) => coin.id !== id));
-  // };
   const showToast = () => {
     toast.success("Successfully added!");
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  const openAlertModal = (coin) => {
+    setSelectedCoin(coin);
+    setAlertModalOpen(true);
+  };
+
+  const closeAlertModal = () => {
+    setAlertModalOpen(false);
+    setSelectedCoin(null);
   };
 
   // const addToWatchlist = async (coin) => {
@@ -67,15 +110,27 @@ const App = ({ watchlist, setWatchlist }) => {
 
   return (
     <div className="App">
-      {coinData.length === 0 ? (
-        <p>Loading...</p>
+      {isLoading && coinData.length === 0 ? (
+        <div className="loading">
+          <i className="fas fa-spinner fa-spin" style={{ marginRight: "10px" }}></i>
+          Loading cryptocurrency data...
+        </div>
       ) : (
+        <>
+          <div style={{ marginBottom: "20px" }}>
+            <h1>
+              <i className="fas fa-chart-line" style={{ marginRight: "10px" }}></i>
+              Cryptocurrency Market
+            </h1>
+            <p style={{ color: "var(--text-secondary)", marginTop: "5px" }}>
+              Real-time cryptocurrency prices and market data
+            </p>
+          </div>
         <table>
           <thead>
             <tr>
               <th>Rank</th>
-              <th>Symbol</th>
-              <th>Name</th>
+              <th>Cryptocurrency</th>
               <th>Price</th>
               <th>Current Supply</th>
               <th>Market Cap</th>
@@ -84,14 +139,34 @@ const App = ({ watchlist, setWatchlist }) => {
               <th>30d Change</th>
               <th>90d Change</th>
               <th>Action</th>
+              <th>Alert</th>
             </tr>
           </thead>
           <tbody>
-            {coinData.map((coin) => (
+            {isLoading && (
+              <tr>
+                <td colSpan="11" style={{ textAlign: "center", padding: "40px" }}>
+                  <i className="fas fa-spinner fa-spin" style={{ marginRight: "10px" }}></i>
+                  Loading...
+                </td>
+              </tr>
+            )}
+            {!isLoading && coinData.map((coin) => (
               <tr key={coin.id}>
                 <td>{coin.cmc_rank}</td>
-                <td>{coin.symbol}</td>
-                <td>{coin.name}</td>
+                <td>
+                  <div className="coin-name-cell">
+                    <CoinIcon 
+                      coinId={coin.id} 
+                      symbol={coin.symbol} 
+                      size={24} 
+                    />
+                    <div className="coin-info">
+                      <div className="coin-name-text">{coin.name}</div>
+                      <div className="coin-symbol">{coin.symbol}</div>
+                    </div>
+                  </div>
+                </td>
                 <td>${coin.quote.USD.price.toFixed(2)}</td>
                 <td>{coin.circulating_supply.toLocaleString()}</td>
                 <td>${coin.quote.USD.market_cap.toLocaleString()}</td>
@@ -153,11 +228,46 @@ const App = ({ watchlist, setWatchlist }) => {
                     Add to Watchlist
                   </button>
                 </td>
+                <td>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                    <button
+                      className="btn-alert"
+                      onClick={() => openAlertModal(coin)}
+                      title="Set Price Alert"
+                    >
+                      <i className="fas fa-bell"></i>
+                      Set Alert
+                    </button>
+                    {getAlertsForCoin(coin.id).length > 0 && (
+                      <div className="alert-indicator">
+                        <i className="fas fa-bell"></i>
+                        <span className="alert-count">{getAlertsForCoin(coin.id).length}</span>
+                      </div>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          totalItems={totalItems}
+          isLoading={isLoading}
+        />
+        </>
       )}
+      
+      <PriceAlertModal
+        isOpen={alertModalOpen}
+        onClose={closeAlertModal}
+        coin={selectedCoin}
+      />
     </div>
   );
 };

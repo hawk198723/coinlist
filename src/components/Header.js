@@ -19,6 +19,10 @@ const Header = () => {
           <i className="fas fa-heart" style={{ marginRight: "5px" }}></i>
           My Watching List
         </Link>
+        <Link to="/alerts" className="nav-link">
+          <i className="fas fa-bell" style={{ marginRight: "5px" }}></i>
+          Price Alerts
+        </Link>
       </div>
       <div className="header-actions">
         <button 

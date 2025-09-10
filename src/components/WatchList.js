@@ -1,7 +1,15 @@
+import React from "react";
 import { toast } from "react-toastify";
 import "../CSS/Styles.css";
+import CoinIcon from "./CoinIcon";
+import PriceAlertModal from "./PriceAlertModal";
+import { usePriceAlert } from "../contexts/PriceAlertContext";
 
 function WatchList({ watchlist, setWatchlist }) {
+  const [alertModalOpen, setAlertModalOpen] = React.useState(false);
+  const [selectedCoin, setSelectedCoin] = React.useState(null);
+  const { getAlertsForCoin } = usePriceAlert();
+
   const onDeleteCoin = (id) => {
     if (window.confirm("Are you sure to delete this coin?")) {
       setWatchlist(watchlist.filter((coin) => coin.id !== id));
@@ -13,6 +21,16 @@ function WatchList({ watchlist, setWatchlist }) {
     toast.success(message);
   };
 
+  const openAlertModal = (coin) => {
+    setSelectedCoin(coin);
+    setAlertModalOpen(true);
+  };
+
+  const closeAlertModal = () => {
+    setAlertModalOpen(false);
+    setSelectedCoin(null);
+  };
+
   return (
     <div className="App">
       <h1>My Watch List</h1>
@@ -21,8 +39,7 @@ function WatchList({ watchlist, setWatchlist }) {
           <thead>
             <tr>
               <th>Rank</th>
-              <th>Symbol</th>
-              <th>Name</th>
+              <th>Cryptocurrency</th>
               <th>Price</th>
               <th>Current Supply</th>
               <th>Market Cap</th>
@@ -31,14 +48,26 @@ function WatchList({ watchlist, setWatchlist }) {
               <th>30d Change</th>
               <th>90d Change</th>
               <th>Action</th>
+              <th>Alert</th>
             </tr>
           </thead>
           <tbody>
             {watchlist.map((coin) => (
               <tr key={coin.id}>
                 <td>{coin.cmc_rank}</td>
-                <td>{coin.symbol}</td>
-                <td>{coin.name}</td>
+                <td>
+                  <div className="coin-name-cell">
+                    <CoinIcon 
+                      coinId={coin.id} 
+                      symbol={coin.symbol} 
+                      size={24} 
+                    />
+                    <div className="coin-info">
+                      <div className="coin-name-text">{coin.name}</div>
+                      <div className="coin-symbol">{coin.symbol}</div>
+                    </div>
+                  </div>
+                </td>
                 <td>${coin.quote.USD.price.toFixed(2)}</td>
                 <td>{coin.circulating_supply.toLocaleString()}</td>
                 <td>${coin.quote.USD.market_cap.toLocaleString()}</td>
@@ -99,6 +128,24 @@ function WatchList({ watchlist, setWatchlist }) {
                     Delete
                   </button>
                 </td>
+                <td>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                    <button
+                      className="btn-alert"
+                      onClick={() => openAlertModal(coin)}
+                      title="Set Price Alert"
+                    >
+                      <i className="fas fa-bell"></i>
+                      Set Alert
+                    </button>
+                    {getAlertsForCoin(coin.id).length > 0 && (
+                      <div className="alert-indicator">
+                        <i className="fas fa-bell"></i>
+                        <span className="alert-count">{getAlertsForCoin(coin.id).length}</span>
+                      </div>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -106,6 +153,12 @@ function WatchList({ watchlist, setWatchlist }) {
       ) : (
         <p>No coins in your watch list yet...</p>
       )}
+      
+      <PriceAlertModal
+        isOpen={alertModalOpen}
+        onClose={closeAlertModal}
+        coin={selectedCoin}
+      />
     </div>
   );
 }
