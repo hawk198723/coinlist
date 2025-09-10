@@ -20,4 +20,5 @@ const getCoinData = async () => {
   }
 };
 
-export default { getCoinData };
+const CMCAPI = { getCoinData };
+export default CMCAPI;

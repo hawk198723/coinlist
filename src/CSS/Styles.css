@@ -4,15 +4,57 @@
   box-sizing: border-box;
 }
 
+/* CSS Variables for Theme Colors */
+:root {
+  /* Light Theme */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f4;
+  --bg-header: #0252ff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-header: #ffffff;
+  --border-color: #ccc;
+  --border-light: #eee;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --hover-bg: #f5f5f5;
+  --table-header-bg: #f2f2f2;
+  --button-bg: #007bff;
+  --button-bg-hover: #0056b3;
+  --green: #28a745;
+  --red: #dc3545;
+  --header-hover: #beeeec;
+}
+
+.dark-theme {
+  /* Dark Theme */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #0d1117;
+  --bg-header: #161b22;
+  --text-primary: #e6edf3;
+  --text-secondary: #7d8590;
+  --text-header: #f0f6fc;
+  --border-color: #30363d;
+  --border-light: #21262d;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --hover-bg: #21262d;
+  --table-header-bg: #161b22;
+  --button-bg: #238636;
+  --button-bg-hover: #2ea043;
+  --green: #3fb950;
+  --red: #f85149;
+  --header-hover: #58a6ff;
+}
+
 /* ---------------------------Header----- */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  background-color: #0252ff;
-  color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-header);
+  color: var(--text-header);
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: all 0.3s ease;
 }
 
 .logo-link {
@@ -38,11 +80,12 @@
 
 .header-nav a,
 .header-actions a {
-  color: #ffffff;
+  color: var(--text-header);
   text-decoration: none;
   margin-right: 20px;
   padding: 15px 0;
   position: relative;
+  transition: color 0.3s ease;
 }
 
 .header-nav a:last-child,
@@ -52,7 +95,7 @@
 
 .header-nav a:hover,
 .header-actions a:hover {
-  color: #beeeec;
+  color: var(--header-hover);
 }
 
 .header-nav a::before,
@@ -63,7 +106,7 @@
   height: 2px;
   bottom: 0;
   left: 0;
-  background-color: #ffffff;
+  background-color: var(--text-header);
   visibility: hidden;
   transition: all 0.3s ease-in-out;
 }
@@ -73,46 +116,76 @@
   visibility: visible;
   width: 100%;
 }
+
+/* Theme Toggle Button */
+.theme-toggle {
+  background: none;
+  border: 2px solid var(--text-header);
+  color: var(--text-header);
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-left: 15px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.theme-toggle:hover {
+  background-color: var(--text-header);
+  color: var(--bg-header);
+}
 /* ---------------------------App----- */
 
 body {
   font-family: "Arial", sans-serif;
-  background-color: #f4f4f4;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
 }
 
 .App {
   margin: 20px auto;
-  background-color: #fff;
-  border-radius: 5px;
+  background-color: var(--bg-primary);
+  border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px var(--shadow);
   margin-top: 0;
   margin-bottom: 0;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 h1,
 h2 {
-  color: #333;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
 }
 
 h2 {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
   padding-bottom: 10px;
   margin-bottom: 20px;
 }
 
 button {
   padding: 8px 15px;
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--button-bg);
+  color: var(--text-header);
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: var(--button-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 ul {
@@ -122,7 +195,9 @@ ul {
 
 li {
   padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+  transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 li:last-child {
@@ -133,24 +208,119 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
 }
 
-table,
 th,
 td {
-  border: 1px solid #ccc;
-}
-
-th,
-td {
-  padding: 8px 12px;
+  padding: 12px 15px;
   text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
 }
 
 th {
-  background-color: #f2f2f2;
+  background-color: var(--table-header-bg);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+td {
+  color: var(--text-primary);
 }
 
 tbody tr:hover {
-  background-color: #f5f5f5;
+  background-color: var(--hover-bg);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Price change colors using CSS variables */
+.price-positive {
+  color: var(--green) !important;
+  font-weight: 600;
+}
+
+.price-negative {
+  color: var(--red) !important;
+  font-weight: 600;
+}
+
+/* Loading Animation */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .header-logo {
+    font-size: 20px;
+    margin-right: 0;
+  }
+  
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .theme-toggle {
+    margin-left: 0;
+  }
+  
+  .App {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 8px 6px;
+  }
+  
+  .header-nav a,
+  .header-actions a {
+    margin-right: 10px;
+    padding: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 6px 4px;
+  }
+  
+  .header-logo {
+    font-size: 18px;
+  }
+  
+  button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
 }

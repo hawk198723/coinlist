@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import CMCAPI from "./services/CMCAPI";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Watchlist from "./components/WatchList";
 
 const App = ({ watchlist, setWatchlist }) => {
   const [coinData, setCoinData] = useState([]);
@@ -97,55 +96,51 @@ const App = ({ watchlist, setWatchlist }) => {
                 <td>{coin.circulating_supply.toLocaleString()}</td>
                 <td>${coin.quote.USD.market_cap.toLocaleString()}</td>
                 <td
-                  style={{
-                    color:
-                      coin.quote.USD.percent_change_1h >= 0 ? "green" : "red",
-                  }}
+                  className={
+                    coin.quote.USD.percent_change_1h >= 0 ? "price-positive" : "price-negative"
+                  }
                 >
                   {coin.quote.USD.percent_change_1h.toFixed(2)}%
                   {coin.quote.USD.percent_change_1h >= 0 ? (
-                    <i className="fas fa-arrow-up"></i>
+                    <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
-                    <i className="fas fa-arrow-down"></i>
+                    <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
                   )}
                 </td>
                 <td
-                  style={{
-                    color:
-                      coin.quote.USD.percent_change_24h >= 0 ? "green" : "red",
-                  }}
+                  className={
+                    coin.quote.USD.percent_change_24h >= 0 ? "price-positive" : "price-negative"
+                  }
                 >
                   {coin.quote.USD.percent_change_24h.toFixed(2)}%
                   {coin.quote.USD.percent_change_24h >= 0 ? (
-                    <i className="fas fa-arrow-up"></i>
+                    <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
-                    <i className="fas fa-arrow-down"></i>
+                    <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
                   )}
                 </td>
                 <td
-                  style={{
-                    color:
-                      coin.quote.USD.percent_change_30d >= 0 ? "green" : "red",
-                  }}
+                  className={
+                    coin.quote.USD.percent_change_30d >= 0 ? "price-positive" : "price-negative"
+                  }
                 >
                   {coin.quote.USD.percent_change_30d.toFixed(2)}%
                   {coin.quote.USD.percent_change_30d >= 0 ? (
-                    <i className="fas fa-arrow-up"></i>
+                    <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
-                    <i className="fas fa-arrow-down"></i>
+                    <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
                   )}
                 </td>
                 <td
-                  style={{
-                    color:
-                      coin.quote.USD.percent_change_90d >= 0 ? "green" : "red",
-                  }}
+                  className={
+                    coin.quote.USD.percent_change_90d >= 0 ? "price-positive" : "price-negative"
+                  }
                 >
                   {coin.quote.USD.percent_change_90d.toFixed(2)}%
                   {coin.quote.USD.percent_change_90d >= 0 ? (
-                    <i className="fas fa-arrow-up"></i>
+                    <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
-                    <i className="fas fa-arrow-down"></i>
+                    <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
                   )}
                 </td>
                 <td>
