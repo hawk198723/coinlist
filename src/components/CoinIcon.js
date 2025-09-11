@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-const CoinIcon = ({ coinId, symbol, size = 24, className = "" }) => {
+const CoinIcon = ({ coinId, symbol, size = 24, className = "", imageUrl = null }) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // CoinMarketCap icon URL format
-  const iconUrl = `https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png`;
+  // 优先使用传入的imageUrl（CoinGecko提供），否则使用CoinMarketCap格式
+  const iconUrl = imageUrl || `https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png`;
 
   const handleImageLoad = () => {
     setIsLoading(false);

@@ -42,7 +42,7 @@ const App = ({ watchlist, setWatchlist }) => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [checkPriceAlerts]);
 
   useEffect(() => {
     fetchData(currentPage, itemsPerPage);
@@ -136,8 +136,7 @@ const App = ({ watchlist, setWatchlist }) => {
               <th>Market Cap</th>
               <th>1h Change</th>
               <th>1d Change</th>
-              <th>30d Change</th>
-              <th>90d Change</th>
+              <th>7d Change</th>
               <th>Action</th>
               <th>Alert</th>
             </tr>
@@ -145,7 +144,7 @@ const App = ({ watchlist, setWatchlist }) => {
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan="11" style={{ textAlign: "center", padding: "40px" }}>
+                <td colSpan="10" style={{ textAlign: "center", padding: "40px" }}>
                   <i className="fas fa-spinner fa-spin" style={{ marginRight: "10px" }}></i>
                   Loading...
                 </td>
@@ -159,7 +158,8 @@ const App = ({ watchlist, setWatchlist }) => {
                     <CoinIcon 
                       coinId={coin.id} 
                       symbol={coin.symbol} 
-                      size={24} 
+                      size={28}
+                      imageUrl={coin.image}
                     />
                     <div className="coin-info">
                       <div className="coin-name-text">{coin.name}</div>
@@ -167,16 +167,16 @@ const App = ({ watchlist, setWatchlist }) => {
                     </div>
                   </div>
                 </td>
-                <td>${coin.quote.USD.price.toFixed(2)}</td>
-                <td>{coin.circulating_supply.toLocaleString()}</td>
-                <td>${coin.quote.USD.market_cap.toLocaleString()}</td>
+                <td>${coin.quote.USD.price?.toFixed(2) || 'N/A'}</td>
+                <td>{coin.circulating_supply ? coin.circulating_supply.toLocaleString() : 'N/A'}</td>
+                <td>{coin.quote.USD.market_cap ? `$${coin.quote.USD.market_cap.toLocaleString()}` : 'N/A'}</td>
                 <td
                   className={
-                    coin.quote.USD.percent_change_1h >= 0 ? "price-positive" : "price-negative"
+                    (coin.quote.USD.percent_change_1h || 0) >= 0 ? "price-positive" : "price-negative"
                   }
                 >
-                  {coin.quote.USD.percent_change_1h.toFixed(2)}%
-                  {coin.quote.USD.percent_change_1h >= 0 ? (
+                  {(coin.quote.USD.percent_change_1h || 0).toFixed(2)}%
+                  {(coin.quote.USD.percent_change_1h || 0) >= 0 ? (
                     <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
                     <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
@@ -184,11 +184,11 @@ const App = ({ watchlist, setWatchlist }) => {
                 </td>
                 <td
                   className={
-                    coin.quote.USD.percent_change_24h >= 0 ? "price-positive" : "price-negative"
+                    (coin.quote.USD.percent_change_24h || 0) >= 0 ? "price-positive" : "price-negative"
                   }
                 >
-                  {coin.quote.USD.percent_change_24h.toFixed(2)}%
-                  {coin.quote.USD.percent_change_24h >= 0 ? (
+                  {(coin.quote.USD.percent_change_24h || 0).toFixed(2)}%
+                  {(coin.quote.USD.percent_change_24h || 0) >= 0 ? (
                     <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
                     <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
@@ -196,23 +196,11 @@ const App = ({ watchlist, setWatchlist }) => {
                 </td>
                 <td
                   className={
-                    coin.quote.USD.percent_change_30d >= 0 ? "price-positive" : "price-negative"
+                    (coin.quote.USD.percent_change_7d || 0) >= 0 ? "price-positive" : "price-negative"
                   }
                 >
-                  {coin.quote.USD.percent_change_30d.toFixed(2)}%
-                  {coin.quote.USD.percent_change_30d >= 0 ? (
-                    <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
-                  ) : (
-                    <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
-                  )}
-                </td>
-                <td
-                  className={
-                    coin.quote.USD.percent_change_90d >= 0 ? "price-positive" : "price-negative"
-                  }
-                >
-                  {coin.quote.USD.percent_change_90d.toFixed(2)}%
-                  {coin.quote.USD.percent_change_90d >= 0 ? (
+                  {(coin.quote.USD.percent_change_7d || 0).toFixed(2)}%
+                  {(coin.quote.USD.percent_change_7d || 0) >= 0 ? (
                     <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
                     <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>

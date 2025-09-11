@@ -45,8 +45,7 @@ function WatchList({ watchlist, setWatchlist }) {
               <th>Market Cap</th>
               <th>1h Change</th>
               <th>1d Change</th>
-              <th>30d Change</th>
-              <th>90d Change</th>
+              <th>7d Change</th>
               <th>Action</th>
               <th>Alert</th>
             </tr>
@@ -60,7 +59,8 @@ function WatchList({ watchlist, setWatchlist }) {
                     <CoinIcon 
                       coinId={coin.id} 
                       symbol={coin.symbol} 
-                      size={24} 
+                      size={28}
+                      imageUrl={coin.image}
                     />
                     <div className="coin-info">
                       <div className="coin-name-text">{coin.name}</div>
@@ -73,11 +73,11 @@ function WatchList({ watchlist, setWatchlist }) {
                 <td>${coin.quote.USD.market_cap.toLocaleString()}</td>
                 <td
                   className={
-                    coin.quote.USD.percent_change_1h >= 0 ? "price-positive" : "price-negative"
+                    (coin.quote.USD.percent_change_1h || 0) >= 0 ? "price-positive" : "price-negative"
                   }
                 >
-                  {coin.quote.USD.percent_change_1h.toFixed(2)}%
-                  {coin.quote.USD.percent_change_1h >= 0 ? (
+                  {(coin.quote.USD.percent_change_1h || 0).toFixed(2)}%
+                  {(coin.quote.USD.percent_change_1h || 0) >= 0 ? (
                     <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
                     <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
@@ -85,11 +85,11 @@ function WatchList({ watchlist, setWatchlist }) {
                 </td>
                 <td
                   className={
-                    coin.quote.USD.percent_change_24h >= 0 ? "price-positive" : "price-negative"
+                    (coin.quote.USD.percent_change_24h || 0) >= 0 ? "price-positive" : "price-negative"
                   }
                 >
-                  {coin.quote.USD.percent_change_24h.toFixed(2)}%
-                  {coin.quote.USD.percent_change_24h >= 0 ? (
+                  {(coin.quote.USD.percent_change_24h || 0).toFixed(2)}%
+                  {(coin.quote.USD.percent_change_24h || 0) >= 0 ? (
                     <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
                     <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
@@ -97,23 +97,11 @@ function WatchList({ watchlist, setWatchlist }) {
                 </td>
                 <td
                   className={
-                    coin.quote.USD.percent_change_30d >= 0 ? "price-positive" : "price-negative"
+                    (coin.quote.USD.percent_change_7d || 0) >= 0 ? "price-positive" : "price-negative"
                   }
                 >
-                  {coin.quote.USD.percent_change_30d.toFixed(2)}%
-                  {coin.quote.USD.percent_change_30d >= 0 ? (
-                    <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
-                  ) : (
-                    <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
-                  )}
-                </td>
-                <td
-                  className={
-                    coin.quote.USD.percent_change_90d >= 0 ? "price-positive" : "price-negative"
-                  }
-                >
-                  {coin.quote.USD.percent_change_90d.toFixed(2)}%
-                  {coin.quote.USD.percent_change_90d >= 0 ? (
+                  {(coin.quote.USD.percent_change_7d || 0).toFixed(2)}%
+                  {(coin.quote.USD.percent_change_7d || 0) >= 0 ? (
                     <i className="fas fa-arrow-up" style={{ marginLeft: "5px" }}></i>
                   ) : (
                     <i className="fas fa-arrow-down" style={{ marginLeft: "5px" }}></i>
