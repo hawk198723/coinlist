@@ -22,7 +22,7 @@ const Root = () => {
     <ThemeProvider>
       <AuthProvider>
         <PriceAlertProvider>
-          <Router>
+          <Router basename="/coinlist">
             <Header />
             <Routes>
               <Route

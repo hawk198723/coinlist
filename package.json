@@ -2,6 +2,7 @@
   "name": "coinlist",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://jasonxw.com/coinlist",
   "proxy": "https://pro-api.coinmarketcap.com",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.6",
