@@ -18,31 +18,51 @@ const App = ({ watchlist, setWatchlist }) => {
 
   const { checkPriceAlerts, getAlertsForCoin } = usePriceAlert();
 
-  // CoinMarketCap has around 10,000+ cryptocurrencies
-  const maxItems = 10000;
+  // CoinGecko supports around 17,000 cryptocurrencies, use conservative estimate
+  const maxItems = 15000;
   const totalPages = Math.ceil(maxItems / itemsPerPage);
 
   const fetchData = useCallback(async (page = 1, limit = 100) => {
     setIsLoading(true);
     try {
       const start = (page - 1) * limit + 1;
+      console.log(`📡 Fetching cryptocurrency data for page ${page} (start: ${start}, limit: ${limit})`);
+      
       const data = await CMCAPI.getCoinData(start, limit);
-      if (data && data.data) {
-        console.log(data);
+      if (data && data.data && data.data.length > 0) {
+        console.log(`✅ Successfully loaded ${data.data.length} cryptocurrencies`);
         setCoinData(data.data);
-        // Use status info from API if available, otherwise estimate
-        setTotalItems(data.status?.total_count || maxItems);
+        // Use actual count from API, update our estimate if we found the end
+        const apiTotalCount = data.status?.total_count || maxItems;
+        setTotalItems(apiTotalCount);
+        
+        // 如果API告诉我们这是最后一页，我们知道确切的总数
+        if (data.status?.is_last_page) {
+          console.log(`📊 Reached last page. Total cryptocurrencies: ${apiTotalCount}`);
+        }
         
         // 检查价格报警
         checkPriceAlerts(data.data);
+      } else {
+        console.warn("No data received from API");
+        toast.warning("No cryptocurrency data available for this page.");
+        setCoinData([]);
       }
     } catch (error) {
       console.error("Failed to fetch coin data:", error);
-      toast.error("Failed to load cryptocurrency data. Please try again.");
+      setCoinData([]);
+      
+      if (error.message.includes('CORS')) {
+        toast.error("Network error: Please try refreshing the page or check your internet connection.");
+      } else if (error.message.includes('429')) {
+        toast.error("Too many requests. Please wait a moment before trying again.");
+      } else {
+        toast.error("Failed to load cryptocurrency data. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [checkPriceAlerts]);
+  }, [checkPriceAlerts, maxItems]);
 
   useEffect(() => {
     fetchData(currentPage, itemsPerPage);
